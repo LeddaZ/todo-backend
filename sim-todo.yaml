@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: ITS 2024
+  description: |-
+    Simulazione 01
+  version: '1'
+servers:
+  - url: http://localhost:3000/api
+tags:
+  - name: todos
+paths:
+  /todos:
+    get:
+      tags:
+        - todos
+      summary: Lista di todo
+      description: |-
+        Torna la lista di todo creati <br>
+        Di default la lista mostra solo gli elementi ancora da completare, usando il parametro showCompleted vengono inclusi anche quelli completati. <br>
+        Il campo expired è true se il todo ha una dueDate, la dueDate è passata rispetto al momento della richiesta e il todo non è completato. <br>
+      operationId: listTodos
+      parameters:
+        - name: showCompleted
+          in: query
+          description: include anche i todo completati
+          required: false
+          explode: true
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      tags:
+        - todos
+      summary: Creazione Todo
+      description: |-
+        Crea un nuovo Todo. Un todo avere o meno una data di scadenza.
+      operationId: addTodo
+      requestBody:
+        $ref: '#/components/requestBodies/Todo'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: viene tornato se la validazione fallisce
+  /todos/{id}/check:
+    patch:
+      tags:
+        - todos
+      summary: Segna completato
+      description: |-
+        Segna un todo come completato andando a impostare la proprietà completed a true
+      operationId: completeTodo
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id del todo da modificare
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: viene tornato se l'id del todo non esiste
+  /todos/{id}/uncheck:
+    patch:
+      tags:
+        - todos
+      summary: Segna come da completare
+      description: |-
+        Segna un todo come da completare andando a impostare la proprietà completed a false
+      operationId: uncompleteTodo
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id del todo da modificare
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: viene tornato se l'id del todo non esiste
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: "string"
+          description: "id univoco generato lato server"
+        title:
+          type: "string"
+        dueDate:
+          type: string
+          format: date
+          description: "data entro la quale completare il task"
+        completed:
+          type: "boolean"
+        expired:
+          type: "boolean"
+          description: "true se il todo ha una dueDate, la data è passata e il task non è completato"
+  requestBodies:
+    Todo:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: John
+                description: il task da eseguire
+              dueDate:
+                type: string
+                format: date
+                description: data entro la quale deve essere completato
+            required:
+              - title
