@@ -1,1 +1,1 @@
-export const errorHandlers = [];
+export const errorHandlers = []
