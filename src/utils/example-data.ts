@@ -4,7 +4,7 @@ import { writeFileSync } from 'fs'
 function generateRandomTodo() {
   return {
     title: faker.commerce.productName(),
-    dueDate: faker.date.future(),
+    dueDate: faker.date.future().toISOString().split('T')[0],
     completed: false,
     expired: false
   }

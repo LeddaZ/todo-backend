@@ -3,7 +3,8 @@ import { TodoModel } from './todo.model'
 
 export class TodoService {
   async list(): Promise<Todo[]> {
-    return TodoModel.find()
+    const results = await TodoModel.find()
+    return results
   }
 }
 
