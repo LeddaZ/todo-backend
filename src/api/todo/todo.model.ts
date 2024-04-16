@@ -2,11 +2,10 @@ import mongoose from 'mongoose'
 import { Todo } from './todo.entity'
 
 const todoSchema = new mongoose.Schema<Todo>({
-  id: String,
   title: String,
   dueDate: String,
-  completed: { type: Boolean, default: false },
-  expired: { type: Boolean, default: false }
+  completed: Boolean,
+  expired: Boolean
 })
 
 todoSchema.set('toJSON', {
