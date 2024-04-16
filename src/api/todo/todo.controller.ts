@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import todoService from './todo.service'
 import { Todo } from './todo.entity'
+import { TypedRequest } from '../../utils/typed-request.interface'
+import { CreateTodoDTO } from './todo.dto'
+import { plainToClass } from 'class-transformer'
+import { validate } from 'class-validator'
 
 export const list = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -11,8 +15,14 @@ export const list = async (_req: Request, res: Response, next: NextFunction) => 
   }
 }
 
-export const add = async (req: Request, res: Response, next: NextFunction) => {
+export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next: NextFunction) => {
   try {
+    const data = plainToClass(CreateTodoDTO, req.body)
+    const errors = await validate(data)
+    if (errors.length) {
+      next(errors)
+      return
+    }
     const { title, dueDate } = req.body
 
     const newItem: Partial<Omit<Todo, 'id' | 'completed' | 'expired'>> = {

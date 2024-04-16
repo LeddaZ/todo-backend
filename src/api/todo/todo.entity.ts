@@ -1,7 +1,7 @@
 export class Todo {
   id: string
   title: string
-  dueDate: Date
+  dueDate: string
   completed: boolean
   expired: boolean
 }
