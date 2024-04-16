@@ -3,8 +3,8 @@ import todoService from './todo.service'
 
 export const list = async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const items = await todoService.list()
-    res.json(items)
+    const results = await todoService.list()
+    res.json(results)
   } catch (err) {
     next(err)
   }

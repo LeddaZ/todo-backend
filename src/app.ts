@@ -1,8 +1,8 @@
-import express from 'express'
+import bodyParser from 'body-parser'
 import cors from 'cors'
+import express from 'express'
 import morgan from 'morgan'
 import apiRouter from './api/routes'
-import bodyParser from 'body-parser'
 import { errorHandlers } from './errors'
 
 const app = express()
