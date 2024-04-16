@@ -1,8 +1,9 @@
 import express from 'express'
-import { list } from './todo.controller'
+import { add, list } from './todo.controller'
 
 const router = express.Router()
 
 router.get('/', list)
+router.post('/', add)
 
 export default router
