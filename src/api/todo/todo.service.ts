@@ -22,14 +22,20 @@ export class TodoService {
     return item
   }
 
-  async check(id: string, data: Partial<Omit<Todo, 'id'>>): Promise<Todo> {
+  async check(
+    id: string,
+    data: Partial<Omit<Todo, 'id'>>,
+    newCheckedValue: boolean
+  ): Promise<Todo> {
     const existing = await TodoModel.findById(id)
     if (!existing) {
       throw new NotFoundError()
     }
     const isChecked = existing.completed
-    if (isChecked) {
+    if (isChecked && newCheckedValue) {
       throw new CheckedError(true)
+    } else if (!isChecked && !newCheckedValue) {
+      throw new CheckedError(false)
     }
 
     Object.assign(existing, data)
