@@ -5,8 +5,7 @@ function generateRandomTodo() {
   return {
     title: faker.lorem.words({ min: 2, max: 4 }),
     dueDate: faker.date.future().toISOString().split('T')[0],
-    completed: false,
-    expired: false
+    completed: false
   }
 }
 
