@@ -5,6 +5,7 @@ import { TypedRequest } from '../../utils/typed-request.interface'
 import { CreateTodoDTO } from './todo.dto'
 import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
+import { ValidationError } from '../../errors/validation'
 
 export const list = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -20,7 +21,7 @@ export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next:
     const data = plainToClass(CreateTodoDTO, req.body)
     const errors = await validate(data)
     if (errors.length) {
-      next(errors)
+      next(new ValidationError(errors))
       return
     }
     const { title, dueDate } = req.body

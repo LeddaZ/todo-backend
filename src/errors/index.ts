@@ -1,1 +1,3 @@
-export const errorHandlers = []
+import { validationErrorHandler } from './validation'
+
+export const errorHandlers = [validationErrorHandler]
