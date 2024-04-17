@@ -1,3 +1,4 @@
+import { CheckedError } from '../../errors/checked'
 import { NotFoundError } from '../../errors/not-found'
 import { Todo } from './todo.entity'
 import { TodoModel } from './todo.model'
@@ -25,6 +26,10 @@ export class TodoService {
     const existing = await TodoModel.findById(id)
     if (!existing) {
       throw new NotFoundError()
+    }
+    const isChecked = existing.completed
+    if (isChecked) {
+      throw new CheckedError(true)
     }
 
     Object.assign(existing, data)
