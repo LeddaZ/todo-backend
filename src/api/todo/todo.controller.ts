@@ -37,3 +37,10 @@ export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next:
     next(err)
   }
 }
+
+export const check = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params
+
+  const updated = await todoService.check(id, { completed: true })
+  res.json(updated)
+}
