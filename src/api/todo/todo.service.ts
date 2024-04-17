@@ -1,3 +1,4 @@
+import { NotFoundError } from '../../errors/not-found'
 import { Todo } from './todo.entity'
 import { TodoModel } from './todo.model'
 
@@ -23,7 +24,7 @@ export class TodoService {
   async check(id: string, data: Partial<Omit<Todo, 'id'>>): Promise<Todo> {
     const existing = await TodoModel.findById(id)
     if (!existing) {
-      throw new Error()
+      throw new NotFoundError()
     }
 
     Object.assign(existing, data)
