@@ -1,15 +1,20 @@
 import 'reflect-metadata'
 
-import app from './app'
+import dotenv from 'dotenv'
 import mongoose from 'mongoose'
+import app from './app'
+
+dotenv.config()
+const connString = process.env.CONNECTION_STRING ?? ''
+const port = process.env.PORT
 
 mongoose.set('debug', true)
 mongoose
-  .connect('mongodb://127.0.0.1:27017/simulazione-01')
+  .connect(connString)
   .then((_) => {
     console.log('Connected to db')
-    app.listen(3000, () => {
-      console.log('Server listening on port 3000')
+    app.listen(port, () => {
+      console.log(`Server listening on port ${port}`)
     })
   })
   .catch((err) => {
