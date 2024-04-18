@@ -7,9 +7,10 @@ import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
 import { ValidationError } from '../../errors/validation'
 
-export const list = async (_req: Request, res: Response, next: NextFunction) => {
+export const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const results = await todoService.list()
+    const showCompleted = req.query.showCompleted === 'true'
+    const results = await todoService.list(showCompleted)
     res.json(results)
   } catch (err) {
     next(err)

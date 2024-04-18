@@ -4,8 +4,13 @@ import { Todo } from './todo.entity'
 import { TodoModel } from './todo.model'
 
 export class TodoService {
-  async list(): Promise<Todo[]> {
-    const results = await TodoModel.find()
+  async list(showCompleted: boolean): Promise<Todo[]> {
+    let results
+    if (showCompleted) {
+      results = await TodoModel.find()
+    } else {
+      results = await TodoModel.find({ completed: false })
+    }
     return results
   }
 
