@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { Todo } from './todo.entity'
+import { isExpired } from '../../utils/is-expired'
 
 const todoSchema = new mongoose.Schema<Todo>({
   title: String,
@@ -9,7 +10,7 @@ const todoSchema = new mongoose.Schema<Todo>({
 })
 
 todoSchema.pre<Todo>('save', function (next) {
-  this.expired = Date.parse(this.dueDate) < Date.now() && !this.completed
+  this.expired = isExpired(this.dueDate) && !this.completed
   next()
 })
 
@@ -18,6 +19,7 @@ todoSchema.set('toJSON', {
   transform: (_, ret) => {
     delete ret._id
     delete ret.__v
+    ret.expired = isExpired(ret.dueDate) && !ret.completed
     return ret
   }
 })
