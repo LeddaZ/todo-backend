@@ -42,17 +42,8 @@ export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next:
 export const check = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
-    const updated = await todoService.check(id, { completed: true })
-    res.json(updated)
-  } catch (err) {
-    next(err)
-  }
-}
-
-export const uncheck = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { id } = req.params
-    const updated = await todoService.check(id, { completed: false })
+    const { completed } = req.body
+    const updated = await todoService.check(id, completed)
     res.json(updated)
   } catch (err) {
     next(err)
