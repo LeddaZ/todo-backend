@@ -8,12 +8,16 @@ const todoSchema = new mongoose.Schema<Todo>({
   expired: Boolean
 })
 
+todoSchema.pre<Todo>('save', function (next) {
+  this.expired = Date.parse(this.dueDate) < Date.now() && !this.completed
+  next()
+})
+
 todoSchema.set('toJSON', {
   virtuals: true,
   transform: (_, ret) => {
     delete ret._id
     delete ret.__v
-    ret.expired = Date.parse(ret.dueDate) < Date.now()
     return ret
   }
 })
