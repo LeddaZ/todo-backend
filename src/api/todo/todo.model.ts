@@ -5,8 +5,11 @@ import { isExpired } from '../../utils/is-expired'
 const todoSchema = new mongoose.Schema<Todo>({
   title: String,
   dueDate: String,
-  completed: Boolean,
-  expired: Boolean
+  completed: Boolean
+})
+
+todoSchema.virtual('expired').get(function () {
+  return isExpired(this.dueDate) && !this.completed
 })
 
 todoSchema.pre<Todo>('save', function (next) {
@@ -19,7 +22,6 @@ todoSchema.set('toJSON', {
   transform: (_, ret) => {
     delete ret._id
     delete ret.__v
-    ret.expired = isExpired(ret.dueDate) && !ret.completed
     return ret
   }
 })
