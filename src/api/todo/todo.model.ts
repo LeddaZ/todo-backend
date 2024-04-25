@@ -8,15 +8,6 @@ const todoSchema = new mongoose.Schema<Todo>({
   completed: Boolean
 })
 
-todoSchema.virtual('expired').get(function () {
-  return isExpired(this.dueDate) && !this.completed
-})
-
-todoSchema.pre<Todo>('save', function (next) {
-  this.expired = isExpired(this.dueDate) && !this.completed
-  next()
-})
-
 todoSchema.set('toJSON', {
   virtuals: true,
   transform: (_, ret) => {
@@ -24,6 +15,10 @@ todoSchema.set('toJSON', {
     delete ret.__v
     return ret
   }
+})
+
+todoSchema.virtual('expired').get(function () {
+  return isExpired(this.dueDate) && !this.completed
 })
 
 export const TodoModel = mongoose.model<Todo>('Todo', todoSchema)
