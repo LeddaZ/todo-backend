@@ -6,12 +6,11 @@ import { TodoModel } from './todo.model'
 export class TodoService {
   async list(showCompleted: boolean): Promise<Todo[]> {
     let results
-    // TODO: Implement showCompleted
-    //if (showCompleted) {
-    results = await TodoModel.find()
-    //} else {
-    //results = await TodoModel.find({ completed: false })
-    //}
+    if (showCompleted) {
+      results = await TodoModel.find()
+    } else {
+      results = await TodoModel.find({ completed: false })
+    }
     return results
   }
 
