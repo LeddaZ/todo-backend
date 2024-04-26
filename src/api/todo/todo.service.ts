@@ -15,6 +15,7 @@ export class TodoService {
   }
 
   async add(todo: Partial<Omit<Todo, 'id'>>): Promise<Todo> {
+    todo.completed = false
     const newItem = await TodoModel.create(todo)
     return (await this.getById(newItem.id))!
   }
