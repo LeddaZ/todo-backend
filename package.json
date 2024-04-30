@@ -4,17 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start-dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
     "dev": "nodemon",
     "gendata": "ts-node src/utils/example-data.ts",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "build": "tsc"
   },
   "nodemonConfig": {
     "watch": [
       "src",
       ".env"
     ],
-    "exec": "npm start",
+    "exec": "npm run start-dev",
     "ext": "ts",
     "ingnore": [
       "node_modules"
