@@ -1,5 +1,5 @@
 {
-  "name": "sim-express",
+  "name": "todo-backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -22,7 +22,7 @@
       "node_modules"
     ]
   },
-  "author": "",
+  "author": "Leonardo Ledda",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",
