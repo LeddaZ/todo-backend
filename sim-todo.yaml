@@ -1,13 +1,15 @@
 openapi: 3.0.3
 info:
-  title: ITS 2024
+  title: ITS 2023
   description: |-
-    Simulazione 01
+    Esercitazione 1
   version: '1'
 servers:
   - url: http://localhost:3000/api
 tags:
   - name: todos
+  - name: users
+  - name: auth
 paths:
   /todos:
     get:
@@ -15,10 +17,14 @@ paths:
         - todos
       summary: Lista di todo
       description: |-
-        Torna la lista di todo creati <br>
+        Torna la lista di todo creati o assegnati all'utente loggato. <br>
         Di default la lista mostra solo gli elementi ancora da completare, usando il parametro showCompleted vengono inclusi anche quelli completati. <br>
         Il campo expired è true se il todo ha una dueDate, la dueDate è passata rispetto al momento della richiesta e il todo non è completato. <br>
+        Il campo createdBy contiene i dati dell'utente che ha creato il todo (questa informazione non viene passata in fase di creazione, viene presa automaticamente tramite l'autenticazione) <br><br>
+        Di default la lista è ordinata per dueDate dalla data più vecchia a quella più recente, gli elementi senza dueDate vengono dopo in ordine di creazione (ordine di default)
       operationId: listTodos
+      security:
+        - bearerAuth: []
       parameters:
         - name: showCompleted
           in: query
@@ -37,13 +43,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Todo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - todos
       summary: Creazione Todo
       description: |-
-        Crea un nuovo Todo. Un todo avere o meno una data di scadenza.
+        Crea un nuovo Todo. Un todo può essere assegnato o meno a un utente e avere o meno una data di scadenza.
       operationId: addTodo
+      security:
+        - bearerAuth: []
       requestBody:
         $ref: '#/components/requestBodies/Todo'
       responses:
@@ -53,8 +63,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Todo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '400':
-          description: viene tornato se la validazione fallisce
+          description: viene tornato se la validazione fallisce o se si prova a creare un todo assegnandolo ad un utente che non esiste
   /todos/{id}/check:
     patch:
       tags:
@@ -63,6 +75,8 @@ paths:
       description: |-
         Segna un todo come completato andando a impostare la proprietà completed a true
       operationId: completeTodo
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -77,8 +91,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Todo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: viene tornato se l'id del todo non esiste
+          description: viene tornato se l'id del todo non esiste o se l'utente loggato non è né il creatore né l'utente a cui è assegnato il task
   /todos/{id}/uncheck:
     patch:
       tags:
@@ -87,6 +103,8 @@ paths:
       description: |-
         Segna un todo come da completare andando a impostare la proprietà completed a false
       operationId: uncompleteTodo
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -101,9 +119,109 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Todo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '404':
-          description: viene tornato se l'id del todo non esiste
+          description: viene tornato se l'id del todo non esiste o se l'utente loggato non è né il creatore né l'utente a cui è assegnato il task
+  /todos/{id}/assign:
+    post:
+      tags:
+        - todos
+      summary: Assegna un todo
+      description: |-
+        Assegna un todo a un utente
+      operationId: uncompleteTodo
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: id del todo da modificare
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: 'someUserId'
+                  description: id dell'utente a cui assegnare il todo
+              required:
+                - userId
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          description: viene tornato se l'utente a cui si prova ad assegnare il todo non esiste
+        '404':
+          description: viene tornato se l'id del todo non esiste o se il todo non è stato creato dall'utente loggato
+  /users:
+    get:
+      tags:
+        - users
+      summary: List users
+      description: Ritorna la lista di utenti registrati all'applicazione
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /login:
+    post:
+      tags:
+        - auth
+      summary: Login
+      operationId: loginUser
+      requestBody:
+        $ref: '#/components/requestBodies/Login'
+      responses:
+        '200':
+          description: successful operationì
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+        '400':
+          description: Invalid username/password supplied
+  /register:
+    post:
+      tags:
+        - auth
+      summary: Registrazione
+      description: ''
+      operationId: registerUser
+      requestBody:
+        $ref: '#/components/requestBodies/Register'
+      responses:
+        '201':
+          description: successful operationì
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
 components:
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
   schemas:
     Todo:
       type: object
@@ -122,7 +240,77 @@ components:
         expired:
           type: 'boolean'
           description: 'true se il todo ha una dueDate, la data è passata e il task non è completato'
+        createdBy:
+          $ref: '#/components/schemas/User'
+        assignedTo:
+          $ref: '#/components/schemas/User'
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'someUserId'
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        fullName:
+          type: string
+          example: John James
+        picture:
+          type: string
+          example: 'https//somedomain.com/somepicture.png'
+    Login:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+          description: JWT token
   requestBodies:
+    Login:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: 'test@test.com'
+              password:
+                type: string
+                example: 'Password1!'
+            required:
+              - username
+              - password
+    Register:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              firstName:
+                type: string
+                example: John
+              lastName:
+                type: string
+                example: James
+              picture:
+                type: string
+                example: 'https//somedomain.com/somepicture.png'
+              username:
+                type: string
+              password:
+                type: string
+            required:
+              - firstName
+              - lastName
+              - picture
+              - username
+              - password
     Todo:
       content:
         application/json:
@@ -137,5 +325,14 @@ components:
                 type: string
                 format: date
                 description: data entro la quale deve essere completato
+              assignedTo:
+                type: string
+                example: 'someUserId'
+                description: l'utente al quale è assegnato il task
             required:
               - title
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
