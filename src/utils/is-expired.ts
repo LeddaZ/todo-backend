@@ -1,3 +1,4 @@
 export function isExpired(dueDate: string): boolean {
-  return Date.parse(dueDate) < Date.now()
+  const now = new Date().setHours(0, 0, 0, 0)
+  return Date.parse(dueDate) < now
 }
