@@ -1,5 +1,6 @@
 import { CheckedError } from '../../errors/checked'
 import { NotFoundError } from '../../errors/not-found'
+import { PastDateError } from '../../errors/past-date'
 import { Todo } from './todo.entity'
 import { TodoModel } from './todo.model'
 
@@ -16,6 +17,10 @@ export class TodoService {
 
   async add(todo: Partial<Omit<Todo, 'id'>>): Promise<Todo> {
     todo.completed = false
+    const now = new Date().setHours(0, 0, 0, 0)
+    if (Date.parse(todo.dueDate!) < now) {
+      throw new PastDateError()
+    }
     const newItem = await TodoModel.create(todo)
     return (await this.getById(newItem.id))!
   }
