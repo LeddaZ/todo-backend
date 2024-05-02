@@ -24,6 +24,7 @@ export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next:
     }
 
     const saved = await todoService.add(newItem)
+    res.status(201)
     res.json(saved)
   } catch (err) {
     next(err)
