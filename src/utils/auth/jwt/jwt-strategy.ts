@@ -1,8 +1,10 @@
 import passport from 'passport'
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
 import { UserModel } from '../../../api/user/user.model'
+import dotenv from 'dotenv'
 
-export const JWT_SECRET = 'my_jwt_secret'
+dotenv.config()
+export const JWT_SECRET = process.env.JWT_SECRET ?? ''
 
 passport.use(
   new JwtStrategy(
