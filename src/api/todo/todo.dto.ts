@@ -1,4 +1,4 @@
-import { IsDateString, IsString, ValidateIf } from 'class-validator'
+import { IsDateString, IsMongoId, IsOptional, IsString, ValidateIf } from 'class-validator'
 
 export class CreateTodoDTO {
   @IsString()
@@ -7,4 +7,8 @@ export class CreateTodoDTO {
   @IsDateString()
   @ValidateIf((_object, value) => value !== undefined)
   dueDate: string
+
+  @IsMongoId()
+  @IsOptional()
+  assignedTo: string
 }

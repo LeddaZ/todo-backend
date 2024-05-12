@@ -4,6 +4,7 @@ import express from 'express'
 import morgan from 'morgan'
 import apiRouter from './api/routes'
 import { errorHandlers } from './errors'
+import './utils/auth/auth-handlers'
 
 const app = express()
 

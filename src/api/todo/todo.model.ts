@@ -1,11 +1,13 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 import { Todo } from './todo.entity'
 import { isExpired } from '../../utils/is-expired'
 
 const todoSchema = new mongoose.Schema<Todo>({
   title: String,
   dueDate: String,
-  completed: Boolean
+  completed: Boolean,
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+  assignedTo: { type: Schema.Types.ObjectId, ref: 'User' }
 })
 
 todoSchema.set('toJSON', {

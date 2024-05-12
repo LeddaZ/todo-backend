@@ -3,11 +3,14 @@ import todoService from './todo.service'
 import { Todo } from './todo.entity'
 import { TypedRequest } from '../../utils/typed-request.interface'
 import { CreateTodoDTO } from './todo.dto'
+import { UserModel } from '../user/user.model'
+import { UserNotFoundError } from '../../errors/user-not-found'
 
 export const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const showCompleted = req.query.showCompleted === 'true'
-    const results = await todoService.list(showCompleted)
+    const user = req.user!
+    const results = await todoService.list(showCompleted, user.id!)
     res.json(results)
   } catch (err) {
     next(err)
@@ -16,16 +19,23 @@ export const list = async (req: Request, res: Response, next: NextFunction) => {
 
 export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next: NextFunction) => {
   try {
-    const { title, dueDate } = req.body
+    const { title, dueDate, assignedTo } = req.body
+    const user = req.user!
 
-    const newItem: Partial<Omit<Todo, 'id' | 'completed' | 'expired'>> = {
-      title: title,
-      dueDate: dueDate
+    const createdUser = await UserModel.findById(user.id)
+    const assignedUser = await UserModel.findById(assignedTo)
+    if (assignedTo != undefined && assignedUser == null) {
+      throw new UserNotFoundError()
+    } else {
+      const newItem: Partial<Omit<Todo, 'id' | 'expired'>> = {
+        title: title,
+        dueDate: dueDate,
+        completed: false
+      }
+
+      const saved = await todoService.add(newItem, createdUser!._id, assignedUser?._id)
+      res.status(201).json(saved)
     }
-
-    const saved = await todoService.add(newItem)
-    res.status(201)
-    res.json(saved)
   } catch (err) {
     next(err)
   }
@@ -33,9 +43,32 @@ export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next:
 
 export const check = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const user = req.user!
     const { id } = req.params
-    const { completed } = req.body
-    const updated = await todoService.check(id, completed)
+    const updated = await todoService.check(id, true, user.id!)
+    res.json(updated)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const uncheck = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user!
+    const { id } = req.params
+    const updated = await todoService.check(id, false, user.id!)
+    res.json(updated)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const assign = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user!
+    const { userId } = req.body
+    const { id } = req.params
+    const updated = await todoService.assign(id, user.id!, userId)
     res.json(updated)
   } catch (err) {
     next(err)
