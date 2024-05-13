@@ -4,7 +4,6 @@ import { Todo } from './todo.entity'
 import { TypedRequest } from '../../utils/typed-request.interface'
 import { CreateTodoDTO } from './todo.dto'
 import { UserModel } from '../user/user.model'
-import { UserNotFoundError } from '../../errors/user-not-found'
 
 export const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -24,18 +23,14 @@ export const add = async (req: TypedRequest<CreateTodoDTO>, res: Response, next:
 
     const createdUser = await UserModel.findById(user.id)
     const assignedUser = await UserModel.findById(assignedTo)
-    if (assignedTo != undefined && assignedUser == null) {
-      throw new UserNotFoundError()
-    } else {
-      const newItem: Partial<Omit<Todo, 'id' | 'expired'>> = {
-        title: title,
-        dueDate: dueDate,
-        completed: false
-      }
-
-      const saved = await todoService.add(newItem, createdUser!._id, assignedUser?._id)
-      res.status(201).json(saved)
+    const newItem: Partial<Omit<Todo, 'id' | 'expired'>> = {
+      title: title,
+      dueDate: dueDate,
+      completed: false
     }
+
+    const saved = await todoService.add(newItem, createdUser!._id, assignedUser?._id)
+    res.status(201).json(saved)
   } catch (err) {
     next(err)
   }
@@ -68,7 +63,8 @@ export const assign = async (req: Request, res: Response, next: NextFunction) =>
     const user = req.user!
     const { userId } = req.body
     const { id } = req.params
-    const updated = await todoService.assign(id, user.id!, userId)
+    const assignedUser = await UserModel.findById(userId)
+    const updated = await todoService.assign(id, user.id!, assignedUser?._id)
     res.json(updated)
   } catch (err) {
     next(err)

@@ -6,9 +6,14 @@ export class UserNotFoundError extends Error {
   }
 }
 
-export const notFoundHandler = (err: Error, _req: Request, res: Response, next: NextFunction) => {
+export const userNotFoundHandler = (
+  err: Error,
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (err instanceof UserNotFoundError) {
-    res.status(404)
+    res.status(400)
     res.json({
       error: 'UserNotFoundError',
       message: 'User not found'

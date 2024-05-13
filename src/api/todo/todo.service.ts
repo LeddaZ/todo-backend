@@ -5,6 +5,7 @@ import { PastDateError } from '../../errors/past-date'
 import { UserModel } from '../user/user.model'
 import { Todo } from './todo.entity'
 import { TodoModel } from './todo.model'
+import { UserNotFoundError } from '../../errors/user-not-found'
 
 export class TodoService {
   async list(showCompleted: boolean, userId: string): Promise<Todo[]> {
@@ -29,6 +30,11 @@ export class TodoService {
     if (Date.parse(todo.dueDate!) < now) {
       throw new PastDateError()
     }
+
+    if (!assignedTo) {
+      throw new UserNotFoundError()
+    }
+
     const newItem = await TodoModel.create({
       ...todo,
       createdBy: createdBy,
@@ -45,9 +51,11 @@ export class TodoService {
     })
       .populate('createdBy')
       .populate('assignedTo')
+
     if (!item) {
       return null
     }
+
     return item
   }
 
@@ -56,9 +64,11 @@ export class TodoService {
       _id: id,
       $or: [{ createdBy: userId }, { assignedTo: userId }]
     })
+
     if (!existing) {
       throw new NotFoundError()
     }
+
     const isChecked = existing.completed
     if (isChecked && completed) {
       throw new CheckedError(true)
@@ -72,13 +82,17 @@ export class TodoService {
     return updated!
   }
 
-  async assign(id: string, userId: string, assignedTo: string): Promise<Todo> {
+  async assign(id: string, userId: string, assignedTo?: Types.ObjectId): Promise<Todo> {
     const existing = await TodoModel.findOne({
       _id: id,
       createdBy: userId
     })
     if (!existing) {
       throw new NotFoundError()
+    }
+
+    if (!assignedTo) {
+      throw new UserNotFoundError()
     }
 
     Object.assign(existing, { assignedTo: assignedTo })
