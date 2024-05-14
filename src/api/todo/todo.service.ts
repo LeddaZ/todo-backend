@@ -12,11 +12,15 @@ export class TodoService {
     let results
     if (showCompleted) {
       results = await TodoModel.find({ $or: [{ createdBy: userId }, { assignedTo: userId }] })
+        .populate('createdBy')
+        .populate('assignedTo')
     } else {
       results = await TodoModel.find({
         completed: false,
         $or: [{ createdBy: userId }, { assignedTo: userId }]
       })
+        .populate('createdBy')
+        .populate('assignedTo')
     }
     return results
   }

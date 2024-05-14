@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon",
     "gendata": "ts-node src/utils/example-data.ts",
+    "genimg": "ts-node src/utils/image-generator.ts",
     "test": "jest --runInBand",
     "build": "tsc"
   },
@@ -18,7 +19,7 @@
     ],
     "exec": "npm run start-dev",
     "ext": "ts",
-    "ingnore": [
+    "ignore": [
       "node_modules"
     ]
   },
