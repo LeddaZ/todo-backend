@@ -31,7 +31,9 @@ export class TodoService {
       throw new PastDateError()
     }
 
-    if (!assignedTo) {
+    const assignedUser = await UserModel.findById(assignedTo)
+
+    if (assignedTo != undefined && assignedUser == null) {
       throw new UserNotFoundError()
     }
 

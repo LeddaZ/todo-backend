@@ -6,8 +6,10 @@ import { UserExistsError } from '../../errors/user-exists'
 import userService from '../user/user.service'
 import passport from 'passport'
 import * as jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
 
-const JWT_SECRET = 'my_jwt_secret'
+dotenv.config()
+export const JWT_SECRET = process.env.JWT_SECRET ?? ''
 
 export const add = async (req: TypedRequest<AddUserDTO>, res: Response, next: NextFunction) => {
   try {
