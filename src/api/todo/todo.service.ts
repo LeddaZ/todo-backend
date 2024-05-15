@@ -12,6 +12,7 @@ export class TodoService {
     let results
     if (showCompleted) {
       results = await TodoModel.find({ $or: [{ createdBy: userId }, { assignedTo: userId }] })
+        .sort({ dueDate: 1 })
         .populate('createdBy')
         .populate('assignedTo')
     } else {
@@ -19,6 +20,7 @@ export class TodoService {
         completed: false,
         $or: [{ createdBy: userId }, { assignedTo: userId }]
       })
+        .sort({ dueDate: 1 })
         .populate('createdBy')
         .populate('assignedTo')
     }
