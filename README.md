@@ -11,8 +11,10 @@ This has been tested on Node 20 LTS.
 ```
 git clone https://github.com/LeddaZ/todo-backend
 cd todo-backend
-# Rename .env.example to .env and fill in the MongoDB connection string, port and JWT secret
-# WARNING: Changing the JWT secret will invalidate existing accounts
+# Rename .env.example to .env and fill in the MongoDB
+# connection string, port and JWT secret;
+# If you're deploying the app in production, set
+# NODE_ENV=production to disable Mongoose debugging
 npm i
 npm run dev
 ```

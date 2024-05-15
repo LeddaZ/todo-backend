@@ -7,8 +7,10 @@ import app from './app'
 dotenv.config()
 const connString = process.env.CONNECTION_STRING ?? ''
 const port = process.env.PORT
+const env = process.env.NODE_ENV
 
-mongoose.set('debug', true)
+if (env != 'production') mongoose.set('debug', true)
+
 mongoose
   .connect(connString)
   .then((_) => {

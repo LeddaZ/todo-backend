@@ -17,7 +17,6 @@ passport.use(
           return done(null, false, { message: `Username ${username} not found` })
         }
         const match = await bcrypt.compare(password, identity.credentials.hashedPassword)
-        // vado a convertirlo in oggetto semplice per eliminare i metodi di mongoose
         const plainUser = identity.toObject().user
         if (match) {
           return done(null, plainUser)
